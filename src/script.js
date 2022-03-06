@@ -9,10 +9,10 @@ import * as dat from 'lil-gui'
 const loadingManager = new THREE.LoadingManager()
 const textureLoader = new THREE.TextureLoader(loadingManager)
 
-const doorColorTexture = textureLoader.load('/moon_color.jpg')
+const moonColorTexture = textureLoader.load('/moon_color.jpg')
 
 
-const doorHeightTexture = textureLoader.load('/moon_height.jpg')
+const moonHeightTexture = textureLoader.load('/moon_height.jpg')
 
 
 const gui = new dat.GUI({width: 500})
@@ -27,36 +27,16 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 //Objects
-// const material = new THREE.MeshBasicMaterial()
-// material.map = doorColorTexture
-// material.transparent = true
-// material.alphaMap = doorAlphaTexture
-// material.side = THREE.DoubleSide
 
-// const material = new THREE.MeshNormalMaterial()
-
-// const material = new THREE.MeshMatcapMaterial()
-// material.matcap = matcapTexture
-
-// const material = new THREE.MeshDepthMaterial()
-
-// const material = new THREE.MeshLambertMaterial()
-
-// const material = new THREE.MeshPhongMaterial()
-// material.shininess = 100
-
-// const material = new THREE.MeshToonMaterial()
-// material.gradientMap = gradientTexture
 
 const material = new THREE.MeshStandardMaterial()
-material.map = doorColorTexture
+material.map = moonColorTexture
 // material.aoMapIntensity = 1
-material.displacementMap = doorHeightTexture
-material.displacementScale = 0.02
-// material.metalnessMap = doorMetalnessTexture
-// material.roughnessMap = doorRoughnessTexture
+material.displacementMap = moonHeightTexture
+material.displacementScale = 0.025
 
-// material.metalness = 0;
+gui.add(material, 'displacementScale', 0, .1, 0.005).name("Displacement Scale")
+
 material.roughness = 1;
 
 
@@ -70,66 +50,13 @@ const sphere = new THREE.Mesh(
 sphere.castShadow = true;
 sphere.receiveShadow = true;
 
-// sphere.geometry.setAttribute(
-//     'uv2',
-//     new THREE.BufferAttribute(sphere.geometry.attributes.uv.array, 2)
-// )
 
-
-
-// const plane = new THREE.Mesh(
-//     new THREE.PlaneGeometry(1, 1, 200, 200),
-//     material
-// )
-
-// plane.geometry.setAttribute(
-//     'uv2',
-//     new THREE.BufferAttribute(plane.geometry.attributes.uv.array, 2)
-// )
-
-// const torus = new THREE.Mesh(
-//     new THREE.TorusGeometry(0.3, 0.2, 64, 128),
-//     material
-// )
-// torus.position.x = 1.5
-// torus.geometry.setAttribute(
-//     'uv2',
-//     new THREE.BufferAttribute(torus.geometry.attributes.uv.array, 2)
-// )
 
 scene.add(sphere)
 
 //Lights
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.2)
 scene.add(ambientLight)
-
-// const pointLight = new THREE.PointLight(0xffffff, 1.5)
-// pointLight.position.x = 2
-// pointLight.position.y = 3
-// pointLight.position.z = 4
-// scene.add(pointLight)
-
-// const spotLight = new THREE.SpotLight(0xffffff, 6, 3, 0.3)
-// spotLight.castShadow = true
-// spotLight.shadow.mapSize.width = 10000
-// spotLight.shadow.mapSize.height = 10000
-// spotLight.position.set(2, 2, 0)
-// spotLight.target.position.x = 0
-// spotLight.target.position.y = 0
-// spotLight.target.position.z = 0
-// scene.add(spotLight.target)
-
-// const spotLightHelper = new THREE.SpotLightHelper( spotLight );
-// scene.add( spotLightHelper );
-
-// window.requestAnimationFrame(() => {
-//     spotLightHelper.update()
-// }) 
-
-// scene.add(spotLight)
-
-// gui.add(spotLight, 'angle', 0, 50, 0.001)
-//     .name("Spotlight Angle")
 
 
 
@@ -161,14 +88,6 @@ directionalLight.shadow.camera.bottom = -0.6;
 const shadowCamera = new THREE.CameraHelper( directionalLight.shadow.camera )
 // scene.add(shadowCamera)
 
-// gui.add(directionalLight.shadow.mapSize, 'width', 2000, 100000, 100)
-//     .name("Directional Light Shadow Map Size Width")
-
-// gui.add(directionalLight.shadow.mapSize, 'height', 2000, 100000, 100)
-//     .name("Directional Light Shadow Map Size Height")
-
-// gui.add(directionalLight, 'shadowDarkness', 0, 100, 1)
-//     .name("shadow darkness")
 
 /**
  * Sizes
@@ -200,7 +119,7 @@ window.addEventListener('resize', () =>
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 camera.position.x = 1
-camera.position.y = 1
+camera.position.y = 0
 camera.position.z = 2
 scene.add(camera)
 
@@ -232,12 +151,6 @@ const tick = () =>
 
     //Update objects
     sphere.rotation.y = 0.1 * elapsedTime
-    // plane.rotation.y = 0.1 * elapsedTime
-    // torus.rotation.y = 0.1 * elapsedTime
-
-    // sphere.rotation.x = 0.15 * elapsedTime
-    // plane.rotation.x = 0.15 * elapsedTime
-    // torus.rotation.x = 0.15 * elapsedTime
 
     // Update controls
     controls.update()
