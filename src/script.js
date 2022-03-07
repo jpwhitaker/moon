@@ -15,9 +15,11 @@ const loadingManager = new THREE.LoadingManager()
 const textureLoader = new THREE.TextureLoader(loadingManager)
 
 const moonColorTexture = textureLoader.load('/moon_color.jpg')
-
-
 const moonHeightTexture = textureLoader.load('/moon_height.jpg')
+
+
+const moonColorTexture2 = textureLoader.load('/lroc_color_poles_4k.jpg')
+const moonNormalMap = textureLoader.load('/ldem_16_uint.jpg')
 
 
 const gui = new dat.GUI({width: 500})
@@ -35,12 +37,17 @@ const scene = new THREE.Scene()
 
 
 const material = new THREE.MeshStandardMaterial()
-material.map = moonColorTexture
-// material.aoMapIntensity = 1
-material.displacementMap = moonHeightTexture
-material.displacementScale = 0.025
+material.map = moonColorTexture2
+material.aoMapIntensity = 1
+// material.displacementMap = moonHeightTexture
+// material.displacementScale = 0.025
 
-gui.add(material, 'displacementScale', 0, .1, 0.005).name("Displacement Scale")
+// gui.add(material, 'displacementScale', 0, .1, 0.005).name("Displacement Scale")
+
+material.bumpMap = moonNormalMap;
+material.bumpScale = 0.01
+// debugger
+gui.add(material, 'bumpScale', -10, 10, 0.1).name("bump Scale")
 
 material.roughness = 1;
 
@@ -128,6 +135,7 @@ const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 
 camera.position.x = .8
 camera.position.y = 0
 camera.position.z = 1.5
+
 scene.add(camera)
 
 // Controls
