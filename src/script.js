@@ -18,8 +18,8 @@ const moonColorTexture = textureLoader.load('/moon_color.jpg')
 const moonHeightTexture = textureLoader.load('/moon_height.jpg')
 
 
-const moonColorTexture2 = textureLoader.load('/lroc_color_poles_4k.jpg')
-const moonNormalMap = textureLoader.load('/ldem_16_uint.jpg')
+// const moonColorTexture2 = textureLoader.load('/lroc_color_poles_4k.jpg')
+// const moonNormalMap = textureLoader.load('/ldem_16_uint.jpg')
 
 
 const gui = new dat.GUI({width: 500})
@@ -37,14 +37,14 @@ const scene = new THREE.Scene()
 
 
 const material = new THREE.MeshStandardMaterial()
-material.map = moonColorTexture2
+material.map = moonColorTexture
 material.aoMapIntensity = 1
 // material.displacementMap = moonHeightTexture
 // material.displacementScale = 0.025
 
 // gui.add(material, 'displacementScale', 0, .1, 0.005).name("Displacement Scale")
 
-material.bumpMap = moonNormalMap;
+material.bumpMap = moonHeightTexture;
 material.bumpScale = 0.01
 // debugger
 gui.add(material, 'bumpScale', -10, 10, 0.1).name("bump Scale")
@@ -55,7 +55,7 @@ material.roughness = 1;
 
 
 const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 3500, 3500),
+    new THREE.SphereGeometry(0.5,160, 30),
     material
 )
 
@@ -86,8 +86,8 @@ const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight
 
 
 //Set up shadow properties for the light
-directionalLight.shadow.mapSize.width = 100000; // default
-directionalLight.shadow.mapSize.height = 100000; // default
+directionalLight.shadow.mapSize.width = 5000; // default
+directionalLight.shadow.mapSize.height = 5000; // default
 // directionalLight.shadow.camera.near = 0.5; // default
 // directionalLight.shadow.camera.far = 3; // default
 
@@ -140,6 +140,8 @@ scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
+controls.minDistance = 1.1
+
 controls.enableDamping = true
 
 /**
@@ -151,7 +153,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.shadowMap.enabled = true
-renderer.shadowMap.type = THREE.PCFSoftShadowMap
+renderer.shadowMap.type = THREE.PCFShadowMap
 renderer.physicallyCorrectLights = true
 
 /**
