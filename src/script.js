@@ -5,7 +5,9 @@ import { RectAreaLightHelper }  from 'three/examples/jsm/helpers/RectAreaLightHe
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js'
 
 
 import * as dat from 'lil-gui'
@@ -47,7 +49,7 @@ material.aoMapIntensity = 1
 material.bumpMap = moonHeightTexture;
 material.bumpScale = 0.01
 // debugger
-gui.add(material, 'bumpScale', -10, 10, 0.1).name("bump Scale")
+gui.add(material, 'bumpScale', 0, .1, 0.001).name("bump Scale")
 
 material.roughness = 1;
 
@@ -72,6 +74,8 @@ scene.add(sphere)
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.2)
 scene.add(ambientLight)
 
+gui.add(ambientLight, 'intensity', 0, 3, 0.05).name("Ambient Light Intensity")
+
 
 
 //Create a DirectionalLight and turn on shadows for the light
@@ -81,6 +85,8 @@ directionalLight.lookAt(new THREE.Vector3())
 directionalLight.castShadow = true; // default false
 scene.add( directionalLight );
 
+gui.add(directionalLight, 'intensity', 0, 6, 0.5).name("Directional Light Intensity")
+
 const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
 // scene.add(directionalLightHelper)
 
@@ -88,19 +94,14 @@ const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight
 //Set up shadow properties for the light
 directionalLight.shadow.mapSize.width = 5000; // default
 directionalLight.shadow.mapSize.height = 5000; // default
-// directionalLight.shadow.camera.near = 0.5; // default
-// directionalLight.shadow.camera.far = 3; // default
 
-// directionalLight.shadowDarkness = 0.5;
+
 directionalLight.shadow.camera.near = 0;
 directionalLight.shadow.camera.far = 1.4;
 directionalLight.shadow.camera.left = -0.6;
 directionalLight.shadow.camera.right = 0.6;
 directionalLight.shadow.camera.top = 0.6;
 directionalLight.shadow.camera.bottom = -0.6;
-
-const shadowCamera = new THREE.CameraHelper( directionalLight.shadow.camera )
-// scene.add(shadowCamera)
 
 
 /**
@@ -148,24 +149,76 @@ controls.enableDamping = true
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+    canvas: canvas, 
+    antialias: true
 })
-renderer.setSize(sizes.width, sizes.height)
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFShadowMap
 renderer.physicallyCorrectLights = true
 
+//makes shit look weird
+// renderer.outputEncoding = THREE.sRGBEncoding
+//makes it dull
+// renderer.toneMapping = THREE.ReinhardToneMapping
+// renderer.toneMappingExposure = 1.5
+renderer.setSize(sizes.width, sizes.height)
+renderer.setClearColor(new THREE.Color(0x000000))
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
 /**
  * Post processing
  */
-const effectComposer = new EffectComposer(renderer)
-effectComposer.setSize(sizes.width, sizes.height)
+let RenderTargetClass = null
+
+if(renderer.getPixelRatio() === 1 && renderer.capabilities.isWebGL2)
+{
+    RenderTargetClass = THREE.WebGLMultisampleRenderTarget
+    console.log('Using WebGLMultisampleRenderTarget')
+}
+else
+{
+    RenderTargetClass = THREE.WebGLRenderTarget
+    console.log('Using WebGLRenderTarget')
+}
+
+const renderTarget = new RenderTargetClass(
+    800,
+    600,
+    {
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        format: THREE.RGBAFormat
+    }
+)
+
+// Effect composer
+
+const effectComposer = new EffectComposer(renderer, renderTarget)
 effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+effectComposer.setSize(sizes.width, sizes.height)
+
+
+// Render pass
 
 const renderPass = new RenderPass(scene, camera)
 effectComposer.addPass(renderPass)
+
+// Gamma correction pass
+const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader)
+// effectComposer.addPass(gammaCorrectionPass)
+
+// Antialias pass
+if(renderer.getPixelRatio() === 1 && !renderer.capabilities.isWebGL2)
+{
+    const smaaPass = new SMAAPass()
+    effectComposer.addPass(smaaPass)
+
+    console.log('Using SMAA')
+}
+
 const unrealBloomPass = new UnrealBloomPass()
+effectComposer.addPass(unrealBloomPass)
+
 unrealBloomPass.strength = 0.265
 unrealBloomPass.radius = 0.513
 unrealBloomPass.threshold = 0
@@ -175,7 +228,6 @@ gui.add(unrealBloomPass, 'strength').min(0).max(2).step(0.001)
 gui.add(unrealBloomPass, 'radius').min(0).max(2).step(0.001)
 gui.add(unrealBloomPass, 'threshold').min(0).max(1).step(0.001)
 
-effectComposer.addPass(unrealBloomPass)
 
 /**
  * Animate
