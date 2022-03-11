@@ -298,7 +298,7 @@ const thetaCalc = function(num){
         camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
     },
     "waxing-gibbous-moon": function(){
-        this.theta = thetaCalc(3/8)
+        this.theta = thetaCalc(2.5/8)
         console.log(this.theta)
         camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
         camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
@@ -310,7 +310,7 @@ const thetaCalc = function(num){
         camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
     },
     "waning-gibbous-moon": function(){
-        this.theta = thetaCalc(5/8)
+        this.theta = thetaCalc(5.5/8)
         console.log(this.theta)
         camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
         camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
