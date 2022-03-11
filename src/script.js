@@ -25,6 +25,7 @@ const moonHeightTexture = textureLoader.load('/moon_height.jpg')
 
 
 const gui = new dat.GUI()
+gui.close()
 
 /**
  * Base
