@@ -286,25 +286,25 @@ const thetaCalc = function(num){
         camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
     },
     "waxing-crescent-moon": function(){
-        this.theta = thetaCalc(0.125)
+        this.theta = thetaCalc(1.5/8)
         console.log(this.theta)
         camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
         camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
     },
     "quarter-moon": function(){
-        this.theta = thetaCalc(0.25)
+        this.theta = thetaCalc(2/8)
         console.log(this.theta)
         camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
         camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
     },
     "waxing-gibbous-moon": function(){
-        this.theta = thetaCalc(0.375)
+        this.theta = thetaCalc(3/8)
         console.log(this.theta)
         camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
         camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
     },
     "full-moon": function(){
-        this.theta = thetaCalc(0.5)
+        this.theta = thetaCalc(4/8)
         console.log(this.theta)
         camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
         camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
@@ -322,7 +322,7 @@ const thetaCalc = function(num){
         camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
     },
     "waning-crescent-moon": function(){
-        this.theta = thetaCalc(7/8)
+        this.theta = thetaCalc(6.5/8)
         console.log(this.theta)
         camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
         camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
