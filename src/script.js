@@ -25,7 +25,7 @@ const moonHeightTexture = textureLoader.load('/moon_height.jpg')
 
 
 const gui = new dat.GUI()
-gui.close()
+// gui.close()
 
 /**
  * Base
@@ -81,7 +81,7 @@ gui.add(ambientLight, 'intensity', 0, 3, 0.05).name("Ambient Light Intensity")
 
 //Create a DirectionalLight and turn on shadows for the light
 const directionalLight = new THREE.DirectionalLight( 0xffffff, 3);
-directionalLight.position.set( 1, 0, 0 ); //default; light shining from top
+directionalLight.position.set( 0, 0, 1.5 ); //default; light shining from top
 directionalLight.lookAt(new THREE.Vector3())
 directionalLight.castShadow = true; // default false
 scene.add( directionalLight );
@@ -134,9 +134,11 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = .8
+camera.position.x = 0
 camera.position.y = 0
-camera.position.z = 1.5
+camera.position.z = -1.5
+camera.lookAt(sphere.position); // or camera.lookAt(0, 0, 0);
+// directionalLight.position.copy( camera.position );
 
 scene.add(camera)
 
@@ -231,6 +233,129 @@ gui.add(unrealBloomPass, 'threshold').min(0).max(1).step(0.001).name('Bloom Thre
 
 
 /**
+ * Moon Phases
+ */
+
+ const Moon = {
+   phases: ['new-moon', 'waxing-crescent-moon', 'quarter-moon', 'waxing-gibbous-moon', 'full-moon', 'waning-gibbous-moon', 'last-quarter-moon', 'waning-crescent-moon'],
+   phase: function (year, month, day) {
+     let c = 0;
+     let e = 0;
+     let jd = 0;
+     let b = 0;
+
+     if (month < 3) {
+       year--;
+       month += 12;
+     }
+
+     ++month;
+     c = 365.25 * year;
+     e = 30.6 * month;
+     jd = c + e + day - 694039.09; // jd is total days elapsed
+     jd /= 29.5305882; // divide by the moon cycle
+     b = parseInt(jd); // int(jd) -> b, take integer part of jd
+     jd -= b; // subtract integer part to leave fractional part of original jd
+     b = Math.round(jd * 8); // scale fraction from 0-8 and round
+
+     if (b >= 8) b = 0; // 0 and 8 are the same so turn 8 into 0
+
+     return {phase: b, name: Moon.phases[b], };
+   }
+ };
+
+ const today = new Date();
+ const phase = Moon.phase(today.getFullYear(), today.getMonth()+1, today.getDate());
+
+ console.log(phase)
+
+
+ console.log((2 * Math.PI) / phase.phase)
+
+const thetaCalc = function(num){
+    return ((2 * Math.PI) * num)
+}
+
+ // const rotation = {"theta": 0}
+ const rotation = {
+    "theta": (Math.PI) / phase.phase,
+    "new-moon": function(){
+        this.theta = 0
+        console.log(this.theta)
+        camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
+        camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
+    },
+    "waxing-crescent-moon": function(){
+        this.theta = thetaCalc(0.125)
+        console.log(this.theta)
+        camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
+        camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
+    },
+    "quarter-moon": function(){
+        this.theta = thetaCalc(0.25)
+        console.log(this.theta)
+        camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
+        camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
+    },
+    "waxing-gibbous-moon": function(){
+        this.theta = thetaCalc(0.375)
+        console.log(this.theta)
+        camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
+        camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
+    },
+    "full-moon": function(){
+        this.theta = thetaCalc(0.5)
+        console.log(this.theta)
+        camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
+        camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
+    },
+    "waning-gibbous-moon": function(){
+        this.theta = thetaCalc(5/8)
+        console.log(this.theta)
+        camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
+        camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
+    },
+    "last-quarter-moon": function(){
+        this.theta = thetaCalc(6/8)
+        console.log(this.theta)
+        camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
+        camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
+    },
+    "waning-crescent-moon": function(){
+        this.theta = thetaCalc(7/8)
+        console.log(this.theta)
+        camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
+        camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
+    },
+    "today": function(){
+        
+        this.theta = thetaCalc(phase.phase/8)
+        console.log(this.theta)
+        camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
+        camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
+    }
+}
+ 
+ gui.add(rotation, "new-moon")
+ gui.add(rotation, "waxing-crescent-moon")
+ gui.add(rotation, "quarter-moon")
+ gui.add(rotation, "waxing-gibbous-moon")
+ gui.add(rotation, "full-moon")
+ gui.add(rotation, "waning-gibbous-moon")
+ gui.add(rotation, "last-quarter-moon")
+ gui.add(rotation, "waning-crescent-moon")
+ gui.add(rotation, "today")
+ // gui.add(rotation, "theta", 0, 10, .01)
+ 
+
+ var x = camera.position.x;
+ var z = camera.position.z;
+
+    camera.position.x =  x * Math.cos(rotation.theta) + z * Math.sin(rotation.theta);
+    camera.position.z =  z * Math.cos(rotation.theta) - x * Math.sin(rotation.theta);
+
+
+/**
  * Animate
  */
 const clock = new THREE.Clock()
@@ -241,6 +366,9 @@ const tick = () =>
 
     //Update objects
     sphere.rotation.y = 0.1 * elapsedTime
+    // let theta be the amount you want to rotate by
+
+    // camera.lookAt(sphere.position); // or camera.lookAt(0, 0, 0);
 
     // Update controls
     controls.update()
