@@ -24,7 +24,7 @@ const moonHeightTexture = textureLoader.load('/moon_height.jpg')
 // const moonNormalMap = textureLoader.load('/ldem_16_uint.jpg')
 
 
-const gui = new dat.GUI({width: 500})
+const gui = new dat.GUI()
 
 /**
  * Base
@@ -49,7 +49,7 @@ material.aoMapIntensity = 1
 material.bumpMap = moonHeightTexture;
 material.bumpScale = 0.01
 // debugger
-gui.add(material, 'bumpScale', 0, .1, 0.001).name("bump Scale")
+gui.add(material, 'bumpScale', 0, .1, 0.001).name("Bump Scale")
 
 material.roughness = 1;
 
@@ -85,7 +85,7 @@ directionalLight.lookAt(new THREE.Vector3())
 directionalLight.castShadow = true; // default false
 scene.add( directionalLight );
 
-gui.add(directionalLight, 'intensity', 0, 6, 0.5).name("Directional Light Intensity")
+gui.add(directionalLight, 'intensity', 0, 6, 0.05).name("Directional Light Intensity")
 
 const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
 // scene.add(directionalLightHelper)
@@ -223,10 +223,10 @@ unrealBloomPass.strength = 0.265
 unrealBloomPass.radius = 0.513
 unrealBloomPass.threshold = 0
 
-gui.add(unrealBloomPass, 'enabled')
-gui.add(unrealBloomPass, 'strength').min(0).max(2).step(0.001)
-gui.add(unrealBloomPass, 'radius').min(0).max(2).step(0.001)
-gui.add(unrealBloomPass, 'threshold').min(0).max(1).step(0.001)
+gui.add(unrealBloomPass, 'enabled').name('Bloom Enabled')
+gui.add(unrealBloomPass, 'strength').min(0).max(2).step(0.001).name('Bloom Strength')
+gui.add(unrealBloomPass, 'radius').min(0).max(2).step(0.001).name('Bloom Radius')
+gui.add(unrealBloomPass, 'threshold').min(0).max(1).step(0.001).name('Bloom Threshold')
 
 
 /**
